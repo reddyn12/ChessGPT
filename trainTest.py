@@ -28,7 +28,7 @@ model = GPT2LMHeadModel(config).to(device("cuda:0"))
 dataset = load_dataset("text", data_files=dpath)
 
 def encode(lines):
-    return tokenizer(lines["text"], add_special_tokens=True, truncation=True, max_length=512)
+    return tokenizer(lines["text"], add_special_tokens=True, truncation=True, max_length=512*2)
 dataset.set_transform(encode)
 
 dataset = dataset["train"]

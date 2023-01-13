@@ -1,7 +1,3 @@
+import torch
 
-
-
-
-
-
-print("hello")
+torch.cuda.empty_cache()
