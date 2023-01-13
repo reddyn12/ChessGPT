@@ -1,6 +1,6 @@
 from transformers import GPT2Config, GPT2LMHeadModel, GPT2Tokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments
 from datasets import load_dataset
-
+from torch import device
 
 dpath = "dataPre/KingBase2019/kingCleanPre.pgn"
 
@@ -18,10 +18,12 @@ tokenizer.add_special_tokens({
 config = GPT2Config(
     vocab_size = tokenizer.vocab_size,
     bos_token = tokenizer.bos_token_id,
-    eos_token = tokenizer.eos_token_id
+    eos_token = tokenizer.eos_token_id,
+    n_layer=8,
+    n_head=8,
 )
 
-model = GPT2LMHeadModel(config).to("cuda")
+model = GPT2LMHeadModel(config).to(device("cuda:0"))
 
 dataset = load_dataset("text", data_files=dpath)
 
@@ -34,10 +36,10 @@ dataset = dataset["train"]
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=True, mlm_probability=0.15)
 
 training_args = TrainingArguments(
-    output_dir="results",
+    output_dir="smallModel",
     overwrite_output_dir=True,
     num_train_epochs=1,
-    per_device_train_batch_size=64,
+    per_device_train_batch_size=96, #64
     save_steps=10000,
     save_total_limit=2,
     prediction_loss_only=True,
@@ -54,4 +56,4 @@ trainer = Trainer(
 
 
 trainer.train()
-trainer.save_model("results")
+trainer.save_model("smallModel")
