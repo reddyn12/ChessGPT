@@ -36,6 +36,6 @@ Kd5 e4 48.Kxe4 Kc6 49.Kd4 Kb5 50.Kd3 Kxa5 51.Kc3 Ka4 52.Kc4 b5+ 53.Kc3 a5
 '''
 
 t = tokenizer.encode(s)
-print(t.ids)
+print(t.ids) 
 print(t.tokens)
 # %%
