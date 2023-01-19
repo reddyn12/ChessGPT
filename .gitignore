@@ -37,3 +37,6 @@ tokenizerNew/merges.txt
 tokenizerNew/vocab.json
 tokenizerNewClean/merges.txt
 tokenizerNewClean/vocab.json
+__pycache__/customTokenImp.cpython-310.pyc
+tokenizerV2/vocab.json
+tokenizerV2/merges.txt

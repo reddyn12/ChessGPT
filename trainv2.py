@@ -1,5 +1,5 @@
 #%%
-from transformers import GPT2Config, GPT2LMHeadModel, GPT2Tokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments
+from transformers import GPT2Config, GPT2LMHeadModel, GPT2Tokenizer, DefaultDataCollator,DataCollatorForLanguageModeling, DataCollatorWithPadding,Trainer, TrainingArguments
 from tokenizers.implementations import ByteLevelBPETokenizer
 
 from datasets import load_dataset, Dataset
@@ -39,8 +39,8 @@ dataset.set_transform(encode)
 for i in dataset:
     ndata.append(encode(i))'''
 
-data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
-
+#data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+data_collator = DefaultDataCollator()
 training_args = TrainingArguments(
     output_dir="smallModelV2",
     overwrite_output_dir=True,
