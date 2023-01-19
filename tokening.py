@@ -1,15 +1,19 @@
 #%%
-from tokenizers import ByteLevelBPETokenizer
+from tokenizers.implementations import ByteLevelBPETokenizer
+from tokenizers.pre_tokenizers import Whitespace
 
-
+# Maybe charecter tokenize?
+#
 #%%
 
-path = "dataPre/KingBase2019/kingCleanPre.pgn"
+path = "dataPre/KingBase2019/kingCleanV3.pgn"
 
 #%%
 
 tokenizer = ByteLevelBPETokenizer()
-tokenizer.train(files=path, vocab_size=2000, min_frequency=2, special_tokens=[
+tokenizer.pre_tokenizer = Whitespace()
+tokenizer.train(files=path, vocab_size=5000, min_frequency=2, special_tokens=[
+    "<N\nN>",
     "<s>",
     "<pad>",
     "</s>",
@@ -17,7 +21,7 @@ tokenizer.train(files=path, vocab_size=2000, min_frequency=2, special_tokens=[
     "<mask>"
 ])
 
-tokenizer.save_model("tokenizer")
+tokenizer.save_model("tokenizerNewClean")
 
 
 # %%
@@ -73,7 +77,7 @@ Rb7 36.e4 Be6 37.f5 dxe4 38.fxe6 exf3 39.Qxf3 Nxe6 40.Qxb7 1-0
 
 '''
 
-t = tokenizer.encode(s)
+'''t = tokenizer.encode(s)
 print(t.ids) 
-print(t.tokens)
+print(t.tokens)'''
 # %%

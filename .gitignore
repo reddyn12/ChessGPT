@@ -29,3 +29,11 @@ wandb
 results
 smallModel
 512smallModel
+dataPre/KingBase2019/kingCleanSpace.pgn
+dataPre/KingBase2019/kingCleanSpaceNew.pgn
+dataPre/KingBase2019/kingCleanV2.pgn
+dataPre/KingBase2019/kingCleanV3.pgn
+tokenizerNew/merges.txt
+tokenizerNew/vocab.json
+tokenizerNewClean/merges.txt
+tokenizerNewClean/vocab.json

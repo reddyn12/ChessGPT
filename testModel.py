@@ -16,7 +16,7 @@ tokenizer.add_special_tokens({
 
 model = GPT2LMHeadModel.from_pretrained("smallModel").to("cuda")
 
-s = '''1.d4 Nf6 2.g3 g6 3.Bh3 Bg7 4.Nf3 O-O 5.Ng5 d5 6.Nf4 c5 7.Qd2 cxd4 8.Qb4 Ne4 9.Bxc8'''
+s = '''1.d4 Nf6 2.Nc3 e6 3.e4 d5 4.e5 Nfd7 5.Nf3 c5 6.Bg5 Nc6 7.Bxd8 Nxd8 8.dxc5 '''
 
 stoken = tokenizer.encode(s, return_tensors="pt").to("cuda")
 

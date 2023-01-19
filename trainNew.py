@@ -1,10 +1,11 @@
 from transformers import GPT2Config, GPT2LMHeadModel, GPT2Tokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments
 from datasets import load_dataset
 from torch import device
+from tokenizers.implementations import ByteLevelBPETokenizer
 
-dpath = "dataPre/KingBase2019/kingCleanPre.pgn"
+dpath = "dataPre/KingBase2019/kingCleanV2.pgn"
 
-tokenizer = GPT2Tokenizer.from_pretrained("tokenizer")
+tokenizer = ByteLevelBPETokenizer.from_file("tokenizerNew/vocab.json", "tokenizerNew/merges.txt")
 
 #CHECK IF THIS HITS
 tokenizer.add_special_tokens({
@@ -14,6 +15,7 @@ tokenizer.add_special_tokens({
     "pad_token": "<pad>",
     "mask_token": "<mask>"
 })
+tokenizer.get_vocab_size
 
 config = GPT2Config(
     vocab_size = tokenizer.vocab_size,
@@ -56,4 +58,4 @@ trainer = Trainer(
 
 
 trainer.train()
-trainer.save_model("smallModelV2")
+trainer.save_model("smallModel")

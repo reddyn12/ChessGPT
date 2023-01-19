@@ -1,5 +1,6 @@
 #%%
 
+from operator import concat
 import os
 
 from tqdm import tqdm
@@ -9,25 +10,26 @@ testPaths = os.listdir(testParent)
 
 print(testPaths)
 #%%
-for testPath in testPaths:
-    file = open(testParent+"/"+testPath, "r")
-    contents = file.readlines()
-    print(len(contents), "len of contents")
-    cnt = 0
-    fin = ""
-    for i in tqdm(contents):
-        if i.startswith("["):
-            cnt+=1
-            
-        else:
-            fin = fin + i
+def delInfo(testPaths):
+    for testPath in testPaths:
+        file = open(testParent+"/"+testPath, "r")
+        contents = file.readlines()
+        print(len(contents), "len of contents")
+        cnt = 0
+        fin = ""
+        for i in tqdm(contents):
+            if i.startswith("["):
+                cnt+=1
+                
+            else:
+                fin = fin + i
 
-    print(cnt)
-    #print(fin)
-    file1 = open("dataPre/KingBase2019/kingCleanPre.pgn", "a")
-    file1.write(fin+"\n")
-    file.close()
-    file1.close()
+        print(cnt)
+        #print(fin)
+        file1 = open("dataPre/KingBase2019/kingCleanPre.pgn", "a")
+        file1.write(fin+"\n")
+        file.close()
+        file1.close()
 
 #%%
 
@@ -99,4 +101,69 @@ df.close()
 file.close()
 
 
+# %%
+path = "dataPre/KingBase2019/kingCleanPre.pgn"
+
+file = open(path, "r")
+fileOut = open("dataPre/KingBase2019/kingCleanSpace.pgn", "w")
+
+contents = file.read()
+contents = contents.replace("\n\n\n", "\n\n")
+contents = contents.replace(".", " . ")
+fileOut.write(contents)
+file.close()
+fileOut.close()
+
+# %%
+ftest = open("dataPre/KingBase2019/kingCleanSpaceNew.pgn", "r")
+temp = ftest.read()
+ftest.close()
+print(temp[0:200])
+#fout = open("dataPre/KingBase2019/kingCleanSpaceNew.pgn")
+
+# %%
+path = "dataPre/KingBase2019/kingCleanPre.pgn"
+
+file = open(path, "r")
+fileOut = open("dataPre/KingBase2019/kingCleanSpaceNew.pgn", "w")
+
+contents = file.read()
+contents = contents.replace("\n\n\n", " <N> ")
+contents = contents.replace(".", " . ")
+contents = contents.replace("+", " +")
+contents = contents.replace("\n", " ")
+fileOut.write(contents)
+file.close()
+fileOut.close()
+
+# %%
+print(temp[0:2000])
+# %%
+path = "dataPre/KingBase2019/kingCleanPre.pgn"
+
+file = open(path, "r")
+fileOut = open("dataPre/KingBase2019/kingCleanV2.pgn", "w")
+
+contents = file.read()
+contents = contents.replace("\n\n\n", "<N>")
+contents = contents.replace(".", " . ")
+contents = contents.replace("+", " +")
+contents = contents.replace("\n", " ")
+contents = contents.replace("<N>", "\n")
+fileOut.write(contents)
+file.close()
+fileOut.close()
+# %%
+path = "dataPre/KingBase2019/kingCleanV2.pgn"
+
+file = open(path, "r")
+fileOut = open("dataPre/KingBase2019/kingCleanV3.pgn", "w")
+
+contents = file.read()
+contents = contents.replace(" 1", "1")
+contents = contents.replace("\n", " <N\nN> ")
+
+fileOut.write(contents)
+file.close()
+fileOut.close()
 # %%
