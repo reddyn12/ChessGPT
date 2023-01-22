@@ -16,10 +16,10 @@ tokenizer = CustByteLevelBPETokenizer.from_file("tokenizerV2/vocab.json", "token
 # torch.as_tensor()
 # torch.tensor()
 
-model = GPT2LMHeadModel.from_pretrained("smallModelV3").to("cuda")
+model = GPT2LMHeadModel.from_pretrained("iLabV2").to("cuda")
 model.eval()
 
-s = '''1 . d4 '''
+s = "1 . d4"
 tokenizer.no_padding()
 
 stoken = tokenizer.encode(s)
