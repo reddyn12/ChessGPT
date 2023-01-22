@@ -6,7 +6,8 @@ import sys
 dpath = "dataPre/KingBase2019/kingCleanV3.pgn"
 
 tokenizer = GPT2Tokenizer.from_pretrained("tokenizerV2")
-
+# tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+# tokenizer.pad()
 #CHECK IF THIS HITS
 tokenizer.add_special_tokens({
     "eos_token": "<N",
@@ -25,11 +26,13 @@ config = GPT2Config(
 )
 
 model = GPT2LMHeadModel(config).to(device("cuda:0"))
+# model.from_pretrained("smallModelV3/checkpoint-10000")
+# model.train()
 #check out cache_dir
 dataset = load_dataset("text", data_files=dpath)
 
 def encode(lines):
-    return tokenizer(lines["text"], add_special_tokens=True, truncation=True, max_length=512*2)
+    return tokenizer(lines["text"], add_special_tokens=True, truncation=True, max_length=250)
 dataset.set_transform(encode)
 
 dataset = dataset["train"]
@@ -39,10 +42,10 @@ dataset = dataset["train"]
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
 training_args = TrainingArguments(
-    output_dir="smallModelV2",
+    output_dir="smallModelV3",
     overwrite_output_dir=True,
     num_train_epochs=1,
-    per_device_train_batch_size=2, #64
+    per_device_train_batch_size=15, #64
     save_steps=10000,
     save_total_limit=2,
     prediction_loss_only=True,
@@ -62,4 +65,4 @@ trainer = Trainer(
 
 
 trainer.train()
-trainer.save_model("smallModelV2")
+trainer.save_model("smallModelV3") 
