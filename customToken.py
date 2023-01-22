@@ -44,14 +44,15 @@ test ="1 . d4 Nf6 2 . Nf3 e6 3 . c4 c5 4 . e3 d5 5 . Nc3 cxd4 6 . exd4 Bb4 7 . c
 
 def tokenHelp(s):
     try:
+        if s=="":
+            return []
         t = dictToken[s]
         print(s, "IN DICT")
         #print(t, "Found token")
         return [t]
     except KeyError as e:
         print(s, "not in dict")
-        if s=="":
-            return []
+        
         return tokenHelp(s[0]) + tokenHelp(s[1:])
 
 def tokenize(game):
