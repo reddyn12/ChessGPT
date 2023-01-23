@@ -12,7 +12,7 @@ $ torchrun --nproc_per_node=8 --nnodes=2 --node_rank=0 --master_addr=123.456.123
 $ torchrun --nproc_per_node=8 --nnodes=2 --node_rank=1 --master_addr=123.456.123.456 --master_port=1234 train.py
 (If your cluster does not have Infiniband interconnect prepend NCCL_IB_DISABLE=1)
 """
-
+import sys
 import os
 import time
 import math
@@ -25,11 +25,12 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.distributed import init_process_group, destroy_process_group
 
 from customModel import GPTConfig, GPT
+import customToken
 
 # -----------------------------------------------------------------------------
 # default config values designed to train a gpt2 (124M) on OpenWebText
 # I/O
-out_dir = 'out'
+out_dir = 'custOut'
 eval_interval = 2000
 log_interval = 1
 eval_iters = 200
@@ -38,12 +39,12 @@ always_save_checkpoint = True # if True, always save a checkpoint after each eva
 init_from = 'scratch' # 'scratch' or 'resume' or 'gpt2*'
 # wandb logging
 wandb_log = False # disabled by default
-wandb_project = 'owt'
+wandb_project = 'customTest'
 wandb_run_name = 'gpt2' # 'run' + str(time.time())
 # data
-dataset = 'openwebtext'
+dataset = 'KingBase'
 gradient_accumulation_steps = 1 # used to simulate larger batch sizes
-batch_size = 12 # if gradient_accumulation_steps > 1, this is the micro-batch size
+batch_size = 3 # if gradient_accumulation_steps > 1, this is the micro-batch size
 block_size = 1024
 # model
 n_layer = 12
@@ -66,7 +67,7 @@ backend = 'nccl' # 'nccl', 'gloo', etc.
 # system
 device = 'cuda' # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1' etc., or try 'mps' on macbooks
 dtype = 'bfloat16' # 'float32' or 'bfloat16'
-compile = True # use PyTorch 2.0 to compile the model to be faster
+compile = False # use PyTorch 2.0 to compile the model to be faster
 # -----------------------------------------------------------------------------
 config_keys = [k for k,v in globals().items() if not k.startswith('_') and isinstance(v, (int, float, bool, str))]
 exec(open('configurator.py').read()) # overrides from command line or config file
@@ -74,7 +75,8 @@ config = {k: globals()[k] for k in config_keys} # will be useful for logging
 # -----------------------------------------------------------------------------
 
 # various inits, derived attributes, I/O setup
-ddp = int(os.environ.get('RANK', -1)) != -1 # is this a ddp run?
+# ddp = int(os.environ.get('RANK', -1)) != -1 # is this a ddp run?
+ddp=False
 if ddp:
     init_process_group(backend=backend)
     ddp_rank = int(os.environ['RANK'])
@@ -104,6 +106,8 @@ val_data = np.memmap(os.path.join(data_dir, 'val.bin'), dtype=np.uint16, mode='r
 def get_batch(split):
     data = train_data if split == 'train' else val_data
     ix = torch.randint(len(data) - block_size, (batch_size,))
+    #print(ix, "batchSIZE????")
+
     x = torch.stack([torch.from_numpy((data[i:i+block_size]).astype(np.int64)) for i in ix])
     y = torch.stack([torch.from_numpy((data[i+1:i+1+block_size]).astype(np.int64)) for i in ix])
     x, y = x.to(device), y.to(device)
@@ -114,15 +118,16 @@ iter_num = 0
 best_val_loss = 1e9
 
 # attempt to derive vocab_size from the dataset
-meta_path = os.path.join(data_dir, 'meta.pkl')
-if os.path.exists(meta_path):
-    with open(meta_path, 'rb') as f:
-        meta = pickle.load(f)
-    vocab_size = meta['vocab_size']
-    print(f"vocab_size = {vocab_size} (from {meta_path})")
-else:
-    print(f"vocab_size not found in {meta_path}, using GPT-2 default of 50257")
-    vocab_size = 50257
+# meta_path = os.path.join(data_dir, 'meta.pkl')
+# if os.path.exists(meta_path):
+#     with open(meta_path, 'rb') as f:
+#         meta = pickle.load(f)
+#     vocab_size = meta['vocab_size']
+#     print(f"vocab_size = {vocab_size} (from {meta_path})")
+# else:
+#     print(f"vocab_size not found in {meta_path}, using GPT-2 default of 50257")
+#     vocab_size = 50257
+vocab_size = len(customToken.tokens)
 
 # model init
 model_args = dict(n_layer = n_layer, n_head = n_head, n_embd = n_embd, block_size = block_size, dropout = dropout, vocab_size = vocab_size)
@@ -218,6 +223,7 @@ if wandb_log and master_process:
 # training loop
 t0 = time.time()
 while True:
+    print(iter_num,"/",max_iters)
 
     # determine the learning rate for this iteration
     if decay_lr:
@@ -239,8 +245,11 @@ while True:
                 "lr": lr,
             })
         if losses['val'] < best_val_loss or always_save_checkpoint:
+
+            print("hit")
             best_val_loss = losses['val']
             raw_model = model.module if ddp else model
+            print("post hit")
             if iter_num > 0:
                 checkpoint = {
                     'model': raw_model.state_dict(),
@@ -257,7 +266,9 @@ while True:
 
     # forward backward update, with optional gradient accumulation to simulate larger batch size
     for micro_step in range(gradient_accumulation_steps):
+        print(micro_step, "micro_step")
         X, Y = get_batch('train')
+        print("post get batch")
         if ddp:
             # in DDP training we only need to sync gradients at the last micro step.
             # the official way to do this is with model.no_sync() context manager, but
@@ -266,10 +277,13 @@ while True:
             model.require_backward_grad_sync = (micro_step == gradient_accumulation_steps - 1)
         with ctx:
             logits, loss = model(X, Y)
+        print("pre loss.back")
         loss.backward()
+    print("pre optimizer")
     optimizer.step()
     optimizer.zero_grad(set_to_none=True)
-
+    print("this part hir")
+    sys.exit()
     # timing and logging
     t1 = time.time()
     dt = t1 - t0
