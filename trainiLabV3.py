@@ -4,7 +4,8 @@ from torch import device
 import sys
 
 tokenizer = GPT2Tokenizer.from_pretrained("tokeniLabV3",unk_token="<unk>", eos_token="</N>", bos_token="<N>", pad_token="<pad>")
-
+# print(tokenizer("1. d4"))
+# sys.exit()
 dpath = "dataPre/KingBase2019/kingCleanV2.pgn"
 
 
@@ -27,6 +28,8 @@ dataset = dataset["train"]
 
 def encode(lines):
     a = tokenizer(lines["text"], add_special_tokens=True, truncation=True, max_length=512)
+    print(a)
+    sys.exit()
     
     return a
 dataset.set_transform(encode)
