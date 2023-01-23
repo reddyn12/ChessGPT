@@ -26,13 +26,15 @@ from torch.distributed import init_process_group, destroy_process_group
 
 from customModel import GPTConfig, GPT
 import customToken
+from tqdm import tqdm
 
 # -----------------------------------------------------------------------------
 # default config values designed to train a gpt2 (124M) on OpenWebText
 # I/O
 out_dir = 'custOut'
 eval_interval = 2000
-log_interval = 1
+log_interval = 10000
+checkpoint_interval = 10000
 eval_iters = 200
 eval_only = False # if True, script exits right after the first eval
 always_save_checkpoint = True # if True, always save a checkpoint after each eval
@@ -44,7 +46,7 @@ wandb_run_name = 'gpt2' # 'run' + str(time.time())
 # data
 dataset = 'KingBase'
 gradient_accumulation_steps = 1 # used to simulate larger batch sizes
-batch_size = 3 # if gradient_accumulation_steps > 1, this is the micro-batch size
+batch_size = 4 # if gradient_accumulation_steps > 1, this is the micro-batch size
 block_size = 1024
 # model
 n_layer = 12
@@ -115,6 +117,7 @@ def get_batch(split):
 
 # init these up here, can override if init_from='resume' (i.e. from a checkpoint)
 iter_num = 0
+iter_curr = 0
 best_val_loss = 1e9
 
 # attempt to derive vocab_size from the dataset
@@ -156,6 +159,7 @@ elif init_from == 'resume':
             state_dict[k[len(unwanted_prefix):]] = state_dict.pop(k)
     model.load_state_dict(state_dict)
     iter_num = checkpoint['iter_num']
+    iter_curr = checkpoint['iter_num']
     best_val_loss = checkpoint['best_val_loss']
 elif init_from.startswith('gpt2'):
     print(f"Initializing from OpenAI GPT-2 weights: {init_from}")
@@ -222,8 +226,9 @@ if wandb_log and master_process:
 
 # training loop
 t0 = time.time()
-while True:
-    print(iter_num,"/",max_iters)
+# while True:
+for iter_num in tqdm(range(iter_curr, max_iters)):
+    # print(iter_num,"/",max_iters)
 
     # determine the learning rate for this iteration
     if decay_lr:
@@ -244,12 +249,13 @@ while True:
                 "val/loss": losses['val'],
                 "lr": lr,
             })
-        if losses['val'] < best_val_loss or always_save_checkpoint:
+        # if losses['val'] < best_val_loss or always_save_checkpoint:
+        if losses['val'] < best_val_loss or iter_num % checkpoint_interval == 0:
 
-            print("hit")
+            # print("hit")
             best_val_loss = losses['val']
             raw_model = model.module if ddp else model
-            print("post hit")
+            # print("post hit")
             if iter_num > 0:
                 checkpoint = {
                     'model': raw_model.state_dict(),
@@ -266,9 +272,9 @@ while True:
 
     # forward backward update, with optional gradient accumulation to simulate larger batch size
     for micro_step in range(gradient_accumulation_steps):
-        print(micro_step, "micro_step")
+        # print(micro_step, "micro_step")
         X, Y = get_batch('train')
-        print("post get batch")
+        # print("post get batch")
         if ddp:
             # in DDP training we only need to sync gradients at the last micro step.
             # the official way to do this is with model.no_sync() context manager, but
@@ -277,13 +283,13 @@ while True:
             model.require_backward_grad_sync = (micro_step == gradient_accumulation_steps - 1)
         with ctx:
             logits, loss = model(X, Y)
-        print("pre loss.back")
+        # print("pre loss.back")
         loss.backward()
-    print("pre optimizer")
+    # print("pre optimizer")
     optimizer.step()
     optimizer.zero_grad(set_to_none=True)
-    print("this part hir")
-    sys.exit()
+    # print("this part hir")
+    
     # timing and logging
     t1 = time.time()
     dt = t1 - t0
@@ -291,11 +297,11 @@ while True:
     if iter_num % log_interval == 0 and master_process:
         lossf = loss.item() # loss as float. TODO note CPU-GPU sync! profile, make sure not too slow
         print(f"iter {iter_num}: loss {lossf:.4f}, time {dt*1000:.2f}ms")
-    iter_num += 1
+    # iter_num += 1
 
     # termination conditions
-    if iter_num > max_iters:
-        break
+    # if iter_num > max_iters:
+    #     break
 
 if ddp:
     destroy_process_group()
