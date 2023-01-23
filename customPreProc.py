@@ -4,7 +4,6 @@
 import os
 from tqdm import tqdm
 import numpy as np
-import tiktoken
 from datasets import load_dataset # huggingface datasets
 import customToken
 import sys
@@ -16,6 +15,8 @@ import sys
 # import tiktoken
 # number of workers in .map() call
 # good number to use is ~order number of cpu cores // 2
+
+#iLab1 num_pro=8 works no errors
 num_proc = 3
 
 dpath = "dataPre/KingBase2019/kingCleanV2.pgn"
