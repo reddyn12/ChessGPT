@@ -75,6 +75,11 @@ def tokenize(game):
         ans = ans + tokenHelp(" ")
     return ans
 
+def tokenizeArr(games):
+    ans = []
+    for game in games:
+        ans.append(tokenize(game))
+
     # ind=0
     # curr=0
 

@@ -11,6 +11,9 @@ import os
 
 print(int(os.environ.get('RANK', -1)))
 
+a = [1,2,3,4,5,6,7]
+if 4 in a:
+    print("yuh")
 # t2 = ByteLevelBPETokenizer.from_file("tokenizerNewClean/vocab.json", "tokenizerNewClean/merges.txt")
 # t =t2.encode("Hello world")
 # t2.p
