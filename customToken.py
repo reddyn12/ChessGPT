@@ -79,7 +79,11 @@ def tokenizeArr(games):
     ans = []
     for game in games:
         ans.append(tokenize(game))
-
+def decode(s):
+    ans = []
+    for i in s:
+        ans.append(tokens[i])
+    return ans
     # ind=0
     # curr=0
 

@@ -27,6 +27,12 @@ from torch.distributed import init_process_group, destroy_process_group
 from customModel import GPTConfig, GPT
 import customToken
 from tqdm import tqdm
+import sys
+# print(torch.backends.cuda.matmul.allow_tf32)
+# print(torch.backends.cudnn.allow_tf32)
+torch.backends.cuda.matmul.allow_tf32 = True
+# print(torch.backends.cuda.matmul.allow_tf32)
+# sys.exit()
 
 # -----------------------------------------------------------------------------
 # default config values designed to train a gpt2 (124M) on OpenWebText
