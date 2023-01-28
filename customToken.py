@@ -90,9 +90,10 @@ def decode(s):
     # while(ind<len(game)):
     #     print(game[ind])
     #     ind=ind+1
-
-# temp  =tokenize(test)
-# print(temp)
-# print(len(temp))
-# print(len(test.split(" ")))
+test = "1 . Nf3 d5 2 . b3 Bg4 3 . e3 Nd7 4 . Bb2 e6 5 . Be2 Ngf6 6 . O-O Bd6 7 . c4 c6 8 . h3 Bh5 9 . Nc3 Qe7 10 . d4 O-O 11 . Bd3 Bg6 12 . Qc2 Rfe8 13 . Rad1 Rad8 14 . e4 dxe4 15 . Nxe4 Nxe4 16 . Bxe4 Bxe4 17 . Qxe4 f5 18 . Qe3 c5 19 . Rfe1 cxd4 20 . Nxd4 Be5 21 . Nc6 Bxb2 22 . Nxe7 + Rxe7 23 . Qxa7 Ba1 24 . Rxa1"
+#test = " Rxa7 25 . Rxe6 Nc5 26 . Re3 Kf7 27 . Rae1 Rd7  28 . Re5 g6 29 . R1e2 Rd1 + 30 . Kh2 Nd3 31 . Rxf5 + Kg7 32 . Re7 + Rxe7 33 . Rxe7 + Kf6  34 . Re3 Rd2 35 . a3 h5 36 . b4 Kf5 37 . c5 Kf4 38 . Rg3 Nxf2 39 . Rf3 + Kg5 40 . Rxf2  Rxf2 41 . Kg3 Ra2 42 . Kf3 Kf5 43 . Ke3 Ke5 44 . Kd3 Kd5 45 . Kc3 g5 46 . Kb3 Ra1 47 .  Kc3 g4 48 . hxg4 hxg4 49 . Kb3 Kd4 50 . a4 Ke3 51 . Kc4 Rc1 + 52 . Kd5 Rd1 + 53 . Ke6  Kf2 0-1 1 . d4 d5 2 . c4 e6 3 . Nf3 Nf6 4 . Nc3 c6 5 . e3 Nbd7 6 . Qc2 Bd6 7 . Bd3 O-O 8 . O-O  dxc4 9 . Bxc4 a6 10 . Rd1 Qc7 11 . e4 e5 12 . h3 b5 13 . Bb3 exd4 14 . Nxd4 Nc5 15 . Bg5 Nxb3 16 . axb3 Bb7 17 . Nf5 Bh2 + 18 . Kf1 Be5 19 . "
+temp  =tokenize(test)
+print(temp)
+print(len(temp))
+print(len(test.split(" ")))
 #print(tokenize("exd4"))

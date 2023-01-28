@@ -4,7 +4,7 @@ import os
 import pickle
 from contextlib import nullcontext
 import torch
-import tiktoken
+# import tiktoken
 from customModel import GPTConfig, GPT
 import customToken
 
